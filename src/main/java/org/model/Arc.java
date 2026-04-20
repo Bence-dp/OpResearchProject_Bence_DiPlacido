@@ -37,4 +37,9 @@ public class Arc {
     public void setDestination(Node destination) {
         this.destination = destination;
     }
+
+    @Override
+    public String toString() {
+        return getSource().getName() + " -> " + getDestination().getName() + "[label = <<font color=\"green\">"+this.getCapacity()+"</font>,<font color=\"red\">"+this.getCost()+"</font>>]";
+    }
 }

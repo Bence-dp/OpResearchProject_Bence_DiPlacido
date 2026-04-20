@@ -42,9 +42,18 @@ public class Graph {
     public void setNodeList(List<Node> nodeList) {
         this.nodeList = nodeList;
     }
+    public String graphToString(){
 
+        return "";
+    }
+    public String nodeListToString(){
+        return "";
+    }
     @Override
     public String toString() {
-        return "";
+        return "digraph Gv2{     \n" +
+                "              graph [nodesep=\"0.3\", ranksep=\"0.3\",fontsize=12]\n" +
+                "              node [shape=circle,fixedsize=true,width=.3,height=.3,fontsize=12]\n" +
+                "              edge [arrowsize=0.6]\n\n" + graphToString() + "\n\n" + nodeListToString() ;
     }
 }

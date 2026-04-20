@@ -5,7 +5,7 @@ import java.util.List;
 
 public abstract class Node {
     private String name;
-    private List<Arc> arcs;
+    private List<Arc> arcsSortant;
 
 
     public String getName() {
@@ -16,11 +16,11 @@ public abstract class Node {
         this.name = name;
     }
 
-    public List<Arc> getArcs() {
-        return arcs;
+    public List<Arc> getArcsSortant() {
+        return arcsSortant;
     }
 
-    public void setArcs(List<Arc> arcs) {
-        this.arcs = arcs;
+    public void setArcsSortant(List<Arc> arcs) {
+        this.arcsSortant = arcs;
     }
 }
