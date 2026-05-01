@@ -3,6 +3,7 @@ package org.model;
 public class Arc {
     private int cost;
     private int capacity;
+    private int initialCapacity;
     private Node source;
     private Node destination;
 
@@ -20,6 +21,14 @@ public class Arc {
 
     public void setCapacity(int capacity) {
         this.capacity = capacity;
+    }
+
+    public int getInitialCapacity() {
+        return initialCapacity;
+    }
+
+    public void setInitialCapacity(int initialCapacity) {
+        this.initialCapacity = initialCapacity;
     }
 
     public Node getSource() {
@@ -40,6 +49,7 @@ public class Arc {
 
     @Override
     public String toString() {
-        return getSource().getName() + " -> " + getDestination().getName() + "[label = <<font color=\"green\">"+this.getCapacity()+"</font>,<font color=\"red\">"+this.getCost()+"</font>>]";
+        return getSource().getName() + " -> " + getDestination().getName() + " [label = <<font color=\"green\">"
+                + this.getCapacity() + "</font>,<font color=\"red\">" + this.getCost() + "</font>>]";
     }
 }
