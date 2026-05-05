@@ -1,6 +1,9 @@
 package org.model;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class Graph {
     private StartNode startNode;
@@ -9,8 +12,9 @@ public class Graph {
     private Graph residualGraph;
     private int maxFlow;
     private List<Arc> minCutEdges;
-    private java.util.Map<Arc, Arc> residualToOriginal;
-    private java.util.Map<Arc, Boolean> residualIsReverse;
+    private Map<Arc, Arc> residualToOriginal;
+    private Map<Arc, Boolean> residualIsReverse;
+    private Map<Arc, Arc> residualReverseArc;
 
     /**
      * @param startNode
@@ -38,11 +42,11 @@ public class Graph {
         this.maxFlow = maxFlow;
     }
 
-    public java.util.List<Arc> getMinCutEdges() {
+    public List<Arc> getMinCutEdges() {
         return minCutEdges;
     }
 
-    public void setMinCutEdges(java.util.List<Arc> minCutEdges) {
+    public void setMinCutEdges(List<Arc> minCutEdges) {
         this.minCutEdges = minCutEdges;
     }
 
@@ -78,25 +82,33 @@ public class Graph {
         this.residualGraph = residualGraph;
     }
 
-    public java.util.Map<Arc, Arc> getResidualToOriginal() {
+    public Map<Arc, Arc> getResidualToOriginal() {
         return residualToOriginal;
     }
 
-    public void setResidualToOriginal(java.util.Map<Arc, Arc> residualToOriginal) {
+    public void setResidualToOriginal(Map<Arc, Arc> residualToOriginal) {
         this.residualToOriginal = residualToOriginal;
     }
 
-    public java.util.Map<Arc, Boolean> getResidualIsReverse() {
+    public Map<Arc, Boolean> getResidualIsReverse() {
         return residualIsReverse;
     }
 
-    public void setResidualIsReverse(java.util.Map<Arc, Boolean> residualIsReverse) {
+    public void setResidualIsReverse(Map<Arc, Boolean> residualIsReverse) {
         this.residualIsReverse = residualIsReverse;
+    }
+
+    public Map<Arc, Arc> getResidualReverseArc() {
+        return residualReverseArc;
+    }
+
+    public void setResidualReverseArc(Map<Arc, Arc> residualReverseArc) {
+        this.residualReverseArc = residualReverseArc;
     }
 
     public String graphToString(){
         StringBuilder builder = new StringBuilder();
-        java.util.Set<Arc> minCutSet = new java.util.HashSet<>();
+        Set<Arc> minCutSet = new HashSet<>();
         if (this.minCutEdges != null) minCutSet.addAll(this.minCutEdges);
 
         if (startNode != null && startNode.getArcsSortant() != null) {
@@ -112,9 +124,10 @@ public class Graph {
                     .append(arc.getInitialCapacity())
                     .append("</font>,<font color=\"red\">")
                         .append(arc.getCost())
-                        .append("</font>>]")
+                    .append("</font>>")
                 ;
-                if (highlight) builder.append("[color=red]");
+                if (highlight) builder.append(", color=red");
+                builder.append("]");
                 builder.append("\n");
             }
         }
@@ -136,9 +149,10 @@ public class Graph {
                             .append(arc.getInitialCapacity())
                             .append("</font>,<font color=\"red\">")
                             .append(arc.getCost())
-                            .append("</font>>]")
+                            .append("</font>>")
                     ;
-                    if (highlight) builder.append("[color=red]");
+                    if (highlight) builder.append(", color=red");
+                    builder.append("]");
                     builder.append("\n");
                 }
             }
