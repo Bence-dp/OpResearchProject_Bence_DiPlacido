@@ -17,6 +17,8 @@ public class ResidualGraphBuilder {
     public Graph buildFrom(Graph graph) {
         Map<Node, Node> originalToResidual = new HashMap<>();
 
+        // On garde une copie des noeuds pour ne pas mélanger les capacités résiduelles
+        // avec les capacités du graphe initial.
         StartNode residualStart = new StartNode();
         copyNodeData(graph.getStartNode(), residualStart);
         originalToResidual.put(graph.getStartNode(), residualStart);
@@ -82,6 +84,7 @@ public class ResidualGraphBuilder {
             throw new IllegalArgumentException("Arc lié à un noeud absent du graphe.");
         }
 
+        // Un arc direct porte la capacité restante, l'arc inverse permet d'annuler du flot.
         Arc forward = new Arc();
         forward.setSource(residualSource);
         forward.setDestination(residualDestination);

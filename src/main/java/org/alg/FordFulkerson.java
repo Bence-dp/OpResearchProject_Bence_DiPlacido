@@ -21,53 +21,54 @@ public class FordFulkerson implements MaxFlowAlgorithm {
     @Override
     public Graph computeMaxFlow(Graph graph) {
         if (graph == null || graph.getStartNode() == null || graph.getEndNode() == null) {
-            throw new IllegalArgumentException("Graph, start or end node is null");
+            throw new IllegalArgumentException("Le graphe, la source ou le puits est nul.");
         }
 
         resetResult(graph);
         Graph residual = residualGraphBuilder.buildFrom(graph);
 
-        Node s = residual.getStartNode();
-        Node t = residual.getEndNode();
+        Node source = residual.getStartNode();
+        Node sink = residual.getEndNode();
         Map<Arc, Arc> reverseArcs = graph.getResidualReverseArc();
         Map<Arc, Arc> residualToOriginal = graph.getResidualToOriginal();
         Map<Arc, Boolean> residualIsReverse = graph.getResidualIsReverse();
 
         int maxFlow = 0;
 
+        // Edmonds-Karp: on cherche un chemin augmentant en largeur dans le graphe résiduel.
         while (true) {
             Map<Node, Arc> parentArc = new HashMap<>();
 
-            boolean found = bfsFindPath(s, t, parentArc);
-            if (!found) break;
+            boolean pathFound = bfsFindPath(source, sink, parentArc);
+            if (!pathFound) break;
 
             int bottleneck = Integer.MAX_VALUE;
-            Node cur = t;
-            while (cur != s) {
-                Arc resArc = parentArc.get(cur);
-                if (resArc == null) {
+            Node currentNode = sink;
+            while (currentNode != source) {
+                Arc residualArc = parentArc.get(currentNode);
+                if (residualArc == null) {
                     throw new IllegalStateException("Chemin augmentant incomplet dans le graphe résiduel.");
                 }
-                bottleneck = Math.min(bottleneck, resArc.getCapacity());
-                cur = resArc.getSource();
+                bottleneck = Math.min(bottleneck, residualArc.getCapacity());
+                currentNode = residualArc.getSource();
             }
             if (bottleneck == 0 || bottleneck == Integer.MAX_VALUE) {
                 break;
             }
 
-            cur = t;
-            while (cur != s) {
-                Arc resArc = parentArc.get(cur);
-                Arc reverseArc = reverseArcs.get(resArc);
+            currentNode = sink;
+            while (currentNode != source) {
+                Arc residualArc = parentArc.get(currentNode);
+                Arc reverseArc = reverseArcs.get(residualArc);
                 if (reverseArc == null) {
                     throw new IllegalStateException("Arc inverse manquant dans le graphe résiduel.");
                 }
 
-                resArc.setCapacity(resArc.getCapacity() - bottleneck);
+                residualArc.setCapacity(residualArc.getCapacity() - bottleneck);
                 reverseArc.setCapacity(reverseArc.getCapacity() + bottleneck);
 
-                Arc originalArc = residualToOriginal.get(resArc);
-                Boolean reverse = residualIsReverse.get(resArc);
+                Arc originalArc = residualToOriginal.get(residualArc);
+                Boolean reverse = residualIsReverse.get(residualArc);
                 if (originalArc == null || reverse == null) {
                     throw new IllegalStateException("Correspondance vers l'arc original manquante.");
                 }
@@ -77,13 +78,13 @@ public class FordFulkerson implements MaxFlowAlgorithm {
                     originalArc.setFlow(originalArc.getFlow() + bottleneck);
                 }
 
-                cur = resArc.getSource();
+                currentNode = residualArc.getSource();
             }
 
             maxFlow += bottleneck;
         }
 
-        Set<Node> reachable = collectReachable(s);
+        Set<Node> reachable = collectReachable(source);
         Set<Arc> minCut = new LinkedHashSet<>();
         for (Map.Entry<Arc, Arc> entry : residualToOriginal.entrySet()) {
             Arc residualArc = entry.getKey();
@@ -103,24 +104,24 @@ public class FordFulkerson implements MaxFlowAlgorithm {
         return graph;
     }
 
-    private boolean bfsFindPath(Node s, Node t, Map<Node, Arc> parentArc) {
+    private boolean bfsFindPath(Node source, Node sink, Map<Node, Arc> parentArc) {
         Queue<Node> queue = new ArrayDeque<>();
         Set<Node> visited = new HashSet<>();
-        queue.add(s);
-        visited.add(s);
+        queue.add(source);
+        visited.add(source);
 
         while (!queue.isEmpty()) {
-            Node u = queue.poll();
-            List<Arc> arcs = u.getArcsSortant();
+            Node currentNode = queue.poll();
+            List<Arc> arcs = currentNode.getArcsSortant();
             if (arcs == null) continue;
             for (Arc arc : arcs) {
                 if (arc.getCapacity() <= 0) continue;
-                Node v = arc.getDestination();
-                if (visited.contains(v)) continue;
-                parentArc.put(v, arc);
-                visited.add(v);
-                if (v == t) return true;
-                queue.add(v);
+                Node nextNode = arc.getDestination();
+                if (visited.contains(nextNode)) continue;
+                parentArc.put(nextNode, arc);
+                visited.add(nextNode);
+                if (nextNode == sink) return true;
+                queue.add(nextNode);
             }
         }
         return false;
@@ -133,17 +134,17 @@ public class FordFulkerson implements MaxFlowAlgorithm {
         reachable.add(source);
 
         while (!queue.isEmpty()) {
-            Node u = queue.poll();
-            if (u.getArcsSortant() == null) {
+            Node currentNode = queue.poll();
+            if (currentNode.getArcsSortant() == null) {
                 continue;
             }
-            for (Arc arc : u.getArcsSortant()) {
-                Node v = arc.getDestination();
-                if (arc.getCapacity() <= 0 || reachable.contains(v)) {
+            for (Arc arc : currentNode.getArcsSortant()) {
+                Node nextNode = arc.getDestination();
+                if (arc.getCapacity() <= 0 || reachable.contains(nextNode)) {
                     continue;
                 }
-                reachable.add(v);
-                queue.add(v);
+                reachable.add(nextNode);
+                queue.add(nextNode);
             }
         }
         return reachable;
@@ -151,6 +152,7 @@ public class FordFulkerson implements MaxFlowAlgorithm {
 
     private void resetResult(Graph graph) {
         graph.setMaxFlow(0);
+        graph.setCost(0);
         graph.setMinCutEdges(new ArrayList<>());
         for (Node node : originalNodes(graph)) {
             if (node.getArcsSortant() == null) {

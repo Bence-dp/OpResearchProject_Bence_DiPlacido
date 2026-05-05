@@ -11,6 +11,7 @@ public class Graph {
     private List<Node> nodeList;
     private Graph residualGraph;
     private int maxFlow;
+    private int cost;
     private List<Arc> minCutEdges;
     private Map<Arc, Arc> residualToOriginal;
     private Map<Arc, Boolean> residualIsReverse;
@@ -40,6 +41,18 @@ public class Graph {
 
     public void setMaxFlow(int maxFlow) {
         this.maxFlow = maxFlow;
+    }
+
+    public int getCost() {
+        return cost;
+    }
+
+    public void setCost(int cost) {
+        this.cost = cost;
+    }
+
+    public void addCost(int cost) {
+        this.cost += cost;
     }
 
     public List<Arc> getMinCutEdges() {

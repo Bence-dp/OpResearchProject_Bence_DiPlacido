@@ -6,7 +6,6 @@ import org.alg.MaxFlowAlgorithm;
 import org.builder.GraphBuilder;
 import org.model.Arc;
 import org.model.Graph;
-import org.model.Node;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -29,18 +28,19 @@ public class Main {
 
         try {
             Graph graph = graphBuilder.build(inputFilePath);
-            dotPdfExporter.export(graph, inputFilePath, "initials", 0, graph.getMaxFlow());
+            dotPdfExporter.export(graph, inputFilePath, "initials", graph.getCost(), graph.getMaxFlow());
             System.out.println(graph);
 
             MaxFlowAlgorithm maxFlowAlgorithm = selectAlgorithm(useCosts);
             Graph solution = maxFlowAlgorithm.computeMaxFlow(graph);
-            int totalCost = useCosts ? computeTotalCost(solution) : 0;
-            dotPdfExporter.export(solution, inputFilePath, "results", totalCost, solution.getMaxFlow());
+            dotPdfExporter.export(solution, inputFilePath, "results", solution.getCost(), solution.getMaxFlow());
 
             System.out.println("Max flow: " + solution.getMaxFlow());
+            System.out.println("Cost: " + solution.getCost());
+
             System.out.println(solution);
             if (solution.getMinCutEdges() != null) {
-                System.out.println("Min-cut edges:");
+                System.out.println("Arcs de la coupe minimale:");
                 for (Arc arc : solution.getMinCutEdges()) {
                     System.out.println("  " + arc);
                 }
@@ -58,37 +58,12 @@ public class Main {
         return new FordFulkerson();
     }
 
-    private static int computeTotalCost(Graph graph) {
-        int totalCost = 0;
-        if (graph.getStartNode() != null && graph.getStartNode().getArcsSortant() != null) {
-            totalCost += computeArcsCost(graph.getStartNode().getArcsSortant());
-        }
-        if (graph.getNodeList() != null) {
-            for (Node node : graph.getNodeList()) {
-                if (node != null && node.getArcsSortant() != null) {
-                    totalCost += computeArcsCost(node.getArcsSortant());
-                }
-            }
-        }
-        return totalCost;
-    }
-
-    private static int computeArcsCost(Iterable<Arc> arcs) {
-        int totalCost = 0;
-        for (Arc arc : arcs) {
-            totalCost += arc.getFlow() * arc.getCost();
-        }
-        return totalCost;
-    }
-
     private static boolean parseUseCosts(String value) {
         String normalized = value.trim().toLowerCase();
         switch (normalized) {
             case "true":
-
                 return true;
             case "false":
-
                 return false;
             default:
                 throw new IllegalArgumentException(

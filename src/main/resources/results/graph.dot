@@ -1,12 +1,12 @@
 digraph Gv2{     
 graph [nodesep="0.3", ranksep="0.3",fontsize=12]
-label="Cost: 0\nMax flow: 15";
+label="Cost: 125\nMax flow: 15";
 labelloc=t;
 node [shape=circle,fixedsize=true,width=.3,height=.3,fontsize=12]
 edge [arrowsize=0.6]
 
 s -> 0 [label = <<font color="blue">7/10</font>,<font color="red">2</font>>]
-              s -> 1 [label = <<font color="blue">8/8</font>,<font color="red">4</font>>]
+              s -> 1 [label = <<font color="blue">8/8</font>,<font color="red">1</font>>]
               0 -> 1 [label = <<font color="blue">2/5</font>,<font color="red">5</font>>]
               0 -> 2 [label = <<font color="blue">5/5</font>,<font color="red">2</font>>, color=red]
               1 -> 0 [label = <<font color="blue">0/4</font>,<font color="red">1</font>>]
