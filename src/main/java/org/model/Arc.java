@@ -4,6 +4,7 @@ public class Arc {
     private int cost;
     private int capacity;
     private int initialCapacity;
+    private int flow;
     private Node source;
     private Node destination;
 
@@ -29,6 +30,14 @@ public class Arc {
 
     public void setInitialCapacity(int initialCapacity) {
         this.initialCapacity = initialCapacity;
+    }
+
+    public int getFlow() {
+        return flow;
+    }
+
+    public void setFlow(int flow) {
+        this.flow = flow;
     }
 
     public Node getSource() {

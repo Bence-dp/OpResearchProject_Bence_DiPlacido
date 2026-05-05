@@ -9,6 +9,8 @@ public class Graph {
     private Graph residualGraph;
     private int maxFlow;
     private List<Arc> minCutEdges;
+    private java.util.Map<Arc, Arc> residualToOriginal;
+    private java.util.Map<Arc, Boolean> residualIsReverse;
 
     /**
      * @param startNode
@@ -76,14 +78,44 @@ public class Graph {
         this.residualGraph = residualGraph;
     }
 
+    public java.util.Map<Arc, Arc> getResidualToOriginal() {
+        return residualToOriginal;
+    }
+
+    public void setResidualToOriginal(java.util.Map<Arc, Arc> residualToOriginal) {
+        this.residualToOriginal = residualToOriginal;
+    }
+
+    public java.util.Map<Arc, Boolean> getResidualIsReverse() {
+        return residualIsReverse;
+    }
+
+    public void setResidualIsReverse(java.util.Map<Arc, Boolean> residualIsReverse) {
+        this.residualIsReverse = residualIsReverse;
+    }
+
     public String graphToString(){
         StringBuilder builder = new StringBuilder();
+        java.util.Set<Arc> minCutSet = new java.util.HashSet<>();
+        if (this.minCutEdges != null) minCutSet.addAll(this.minCutEdges);
 
         if (startNode != null && startNode.getArcsSortant() != null) {
             for (Arc arc : startNode.getArcsSortant()) {
+                boolean highlight = minCutSet.contains(arc);
                 builder.append("              ")
-                        .append(arc)
-                        .append("\n");
+                        .append(arc.getSource().getName())
+                        .append(" -> ")
+                        .append(arc.getDestination().getName())
+                    .append(" [label = <<font color=\"blue\">")
+                    .append(arc.getFlow())
+                    .append("/")
+                    .append(arc.getInitialCapacity())
+                    .append("</font>,<font color=\"red\">")
+                        .append(arc.getCost())
+                        .append("</font>>]")
+                ;
+                if (highlight) builder.append("[color=red]");
+                builder.append("\n");
             }
         }
 
@@ -93,9 +125,21 @@ public class Graph {
                     continue;
                 }
                 for (Arc arc : node.getArcsSortant()) {
+                    boolean highlight = minCutSet.contains(arc);
                     builder.append("              ")
-                            .append(arc)
-                            .append("\n");
+                            .append(arc.getSource().getName())
+                            .append(" -> ")
+                            .append(arc.getDestination().getName())
+                            .append(" [label = <<font color=\"blue\">")
+                            .append(arc.getFlow())
+                            .append("/")
+                            .append(arc.getInitialCapacity())
+                            .append("</font>,<font color=\"red\">")
+                            .append(arc.getCost())
+                            .append("</font>>]")
+                    ;
+                    if (highlight) builder.append("[color=red]");
+                    builder.append("\n");
                 }
             }
         }

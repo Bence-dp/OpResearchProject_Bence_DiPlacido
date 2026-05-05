@@ -92,6 +92,7 @@ public class GraphBuilder {
                 arc.setDestination(destination);
                 arc.setCapacity(capacity);
                 arc.setInitialCapacity(capacity);
+                arc.setFlow(0);
                 arc.setCost(cost);
 
                 source.getArcsSortant().add(arc);
@@ -105,7 +106,75 @@ public class GraphBuilder {
             }
 
             Graph graph = new Graph(startNode, endNode, middleNodes);
-            graph.setResidualGraph(graph);
+
+            // build residual graph as a separate structure and keep mapping residualArc -> originalArc
+            Map<Node, Node> origToRes = new HashMap<>();
+            StartNode resStart = new StartNode();
+            resStart.setName(startNode.getName());
+            resStart.setArcsSortant(new ArrayList<>());
+            origToRes.put(startNode, resStart);
+
+            EndNode resEnd = new EndNode();
+            resEnd.setName(endNode.getName());
+            resEnd.setArcsSortant(new ArrayList<>());
+            origToRes.put(endNode, resEnd);
+
+            List<Node> resMiddle = new ArrayList<>();
+            for (Node n : middleNodes) {
+                Node rn = new MiddleNode();
+                rn.setName(n.getName());
+                rn.setArcsSortant(new ArrayList<>());
+                resMiddle.add(rn);
+                origToRes.put(n, rn);
+            }
+
+            Graph residual = new Graph(resStart, resEnd, resMiddle);
+
+            Map<Arc, Arc> residualToOriginal = new HashMap<>();
+            Map<Arc, Boolean> residualIsReverse = new HashMap<>();
+
+            java.util.function.BiConsumer<Arc, Node> addResidualArcs = (origArc, resSource) -> {
+                Arc f = new Arc();
+                f.setSource(resSource);
+                Node fDest = origToRes.get(origArc.getDestination());
+                f.setDestination(fDest);
+                f.setCapacity(origArc.getInitialCapacity());
+                f.setInitialCapacity(origArc.getInitialCapacity());
+                f.setCost(origArc.getCost());
+                f.setFlow(0);
+                resSource.getArcsSortant().add(f);
+                residualToOriginal.put(f, origArc);
+                residualIsReverse.put(f, Boolean.FALSE);
+
+                Arc r = new Arc();
+                r.setSource(fDest);
+                r.setDestination(resSource);
+                r.setCapacity(0);
+                r.setInitialCapacity(0);
+                r.setCost(-origArc.getCost());
+                r.setFlow(0);
+                fDest.getArcsSortant().add(r);
+                residualToOriginal.put(r, origArc);
+                residualIsReverse.put(r, Boolean.TRUE);
+            };
+
+            if (startNode.getArcsSortant() != null) {
+                for (Arc origArc : startNode.getArcsSortant()) {
+                    addResidualArcs.accept(origArc, origToRes.get(startNode));
+                }
+            }
+
+            for (Node origNode : middleNodes) {
+                if (origNode.getArcsSortant() == null) continue;
+                for (Arc origArc : origNode.getArcsSortant()) {
+                    addResidualArcs.accept(origArc, origToRes.get(origNode));
+                }
+            }
+
+            graph.setResidualGraph(residual);
+            graph.setResidualToOriginal(residualToOriginal);
+            graph.setResidualIsReverse(residualIsReverse);
+
             return graph;
         }
     }

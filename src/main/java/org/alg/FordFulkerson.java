@@ -4,10 +4,12 @@ import org.model.Arc;
 import org.model.Graph;
 import org.model.Node;
 
+import java.util.ArrayDeque;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 import java.util.Set;
 
 public class FordFulkerson implements MaxFlowAlgorithm {
@@ -18,36 +20,42 @@ public class FordFulkerson implements MaxFlowAlgorithm {
             throw new IllegalArgumentException("Graph, start or end node is null");
         }
 
-        Node s = graph.getStartNode();
-        Node t = graph.getEndNode();
+        Graph residual = graph.getResidualGraph();
+        if (residual == null) {
+            throw new IllegalArgumentException("Residual graph missing on Graph");
+        }
+
+        Node s = residual.getStartNode();
+        Node t = residual.getEndNode();
 
         int maxFlow = 0;
 
         while (true) {
             Map<Node, Arc> parentArc = new HashMap<>();
-            Set<Node> visited = new HashSet<>();
 
-            boolean found = dfsFindPath(s, t, visited, parentArc);
+            boolean found = bfsFindPath(s, t, parentArc);
             if (!found) break;
 
             int bottleneck = Integer.MAX_VALUE;
             Node cur = t;
             while (cur != s) {
-                Arc arc = parentArc.get(cur);
-                if (arc == null) break; // defensive
-                bottleneck = Math.min(bottleneck, arc.getCapacity());
-                cur = arc.getSource();
+                Arc resArc = parentArc.get(cur);
+                if (resArc == null) break;
+                bottleneck = Math.min(bottleneck, resArc.getCapacity());
+                cur = resArc.getSource();
             }
             if (bottleneck == 0 || bottleneck == Integer.MAX_VALUE) break;
 
             cur = t;
             while (cur != s) {
-                Arc arc = parentArc.get(cur);
-                Node u = arc.getSource();
-                Node v = arc.getDestination();
+                Arc resArc = parentArc.get(cur);
+                Node u = resArc.getSource();
+                Node v = resArc.getDestination();
 
-                arc.setCapacity(arc.getCapacity() - bottleneck);
+                // decrease forward residual capacity
+                resArc.setCapacity(resArc.getCapacity() - bottleneck);
 
+                // increase reverse residual capacity
                 Arc rev = findArc(v, u);
                 if (rev == null) {
                     rev = new Arc();
@@ -60,33 +68,44 @@ public class FordFulkerson implements MaxFlowAlgorithm {
                 }
                 rev.setCapacity(rev.getCapacity() + bottleneck);
 
+                // update original arc's flow a
+                Map<Arc, Arc> resToOrig = graph.getResidualToOriginal();
+                Map<Arc, Boolean> resIsRev = graph.getResidualIsReverse();
+                if (resToOrig != null && resIsRev != null) {
+                    Arc orig = resToOrig.get(resArc);
+                    Boolean isRev = resIsRev.get(resArc);
+                    if (orig != null && isRev != null) {
+                        if (isRev) {
+                            orig.setFlow(orig.getFlow() - bottleneck);
+                        } else {
+                            orig.setFlow(orig.getFlow() + bottleneck);
+                        }
+                    }
+                }
+
                 cur = u;
             }
 
             maxFlow += bottleneck;
         }
 
+        // compute reachable set on residual graph
         Set<Node> reachable = new HashSet<>();
         collectReachable(s, reachable);
 
         List<Arc> minCut = new java.util.ArrayList<>();
-        if (s.getArcsSortant() != null) {
-            for (Arc a : s.getArcsSortant()) {
-                Node v = a.getDestination();
-                if (reachable.contains(s) && !reachable.contains(v) && a.getInitialCapacity() > 0) {
-                    minCut.add(a);
-                }
-            }
-        }
-
-        List<Node> nodes = graph.getNodeList();
-        if (nodes != null) {
-            for (Node n : nodes) {
-                if (n.getArcsSortant() == null) continue;
-                for (Arc a : n.getArcsSortant()) {
-                    Node v = a.getDestination();
-                    if (reachable.contains(n) && !reachable.contains(v) && a.getInitialCapacity() > 0) {
-                        minCut.add(a);
+        Map<Arc, Arc> resToOrig = graph.getResidualToOriginal();
+        Map<Arc, Boolean> resIsRev = graph.getResidualIsReverse();
+        if (resToOrig != null && resIsRev != null) {
+            for (Map.Entry<Arc, Arc> e : resToOrig.entrySet()) {
+                Arc resArc = e.getKey();
+                Arc origArc = e.getValue();
+                Boolean isReverse = resIsRev.get(resArc);
+                if (isReverse != null && !isReverse) {
+                    Node uRes = resArc.getSource();
+                    Node vRes = resArc.getDestination();
+                    if (reachable.contains(uRes) && !reachable.contains(vRes) && origArc.getInitialCapacity() > 0) {
+                        if (!minCut.contains(origArc)) minCut.add(origArc);
                     }
                 }
             }
@@ -95,24 +114,28 @@ public class FordFulkerson implements MaxFlowAlgorithm {
         graph.setMaxFlow(maxFlow);
         graph.setMinCutEdges(minCut);
 
-        graph.setMaxFlow(maxFlow);
-        graph.setMinCutEdges(minCut);
-
         return graph;
     }
 
-    private boolean dfsFindPath(Node u, Node sink, Set<Node> visited, Map<Node, Arc> parentArc) {
-        if (u == sink) return true;
-        visited.add(u);
-        List<Arc> arcs = u.getArcsSortant();
-        if (arcs == null) return false;
-        for (Arc arc : arcs) {
-            if (arc.getCapacity() <= 0) continue;
-            Node v = arc.getDestination();
-            if (visited.contains(v)) continue;
-            parentArc.put(v, arc);
-            boolean found = dfsFindPath(v, sink, visited, parentArc);
-            if (found) return true;
+    private boolean bfsFindPath(Node s, Node t, Map<Node, Arc> parentArc) {
+        Queue<Node> queue = new ArrayDeque<>();
+        Set<Node> visited = new HashSet<>();
+        queue.add(s);
+        visited.add(s);
+
+        while (!queue.isEmpty()) {
+            Node u = queue.poll();
+            List<Arc> arcs = u.getArcsSortant();
+            if (arcs == null) continue;
+            for (Arc arc : arcs) {
+                if (arc.getCapacity() <= 0) continue;
+                Node v = arc.getDestination();
+                if (visited.contains(v)) continue;
+                parentArc.put(v, arc);
+                if (v == t) return true;
+                visited.add(v);
+                queue.add(v);
+            }
         }
         return false;
     }
