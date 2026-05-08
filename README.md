@@ -8,6 +8,9 @@ Le programme lit un graphe depuis un fichier texte, calcule soit un flot maximum
 simple, soit un flot maximum de coût minimum, puis génère des fichiers DOT/PDF
 pour visualiser le graphe avant et après le calcul.
 
+Les résultats des flot et min cost demandé en cours sont présents dans `src/main/resources/`
+
+
 ## Prerequis
 
 - Java JDK 17 ou plus récent. Le projet a été réalisé avec OpenJDK 17.

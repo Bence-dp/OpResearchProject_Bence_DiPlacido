@@ -18,6 +18,44 @@ import java.util.Map;
 
 public class GraphBuilder {
 
+    public StartNode createStartNode(int id, String name) {
+        StartNode node = new StartNode();
+        initializeNode(node, id, name);
+        return node;
+    }
+
+    public MiddleNode createMiddleNode(int id, String name) {
+        MiddleNode node = new MiddleNode();
+        initializeNode(node, id, name);
+        return node;
+    }
+
+    public EndNode createEndNode(int id, String name) {
+        EndNode node = new EndNode();
+        initializeNode(node, id, name);
+        return node;
+    }
+
+    public Arc connect(Node source, Node destination, int capacity, int cost) {
+        if (source == null || destination == null) {
+            throw new IllegalArgumentException("Impossible de connecter un noeud nul.");
+        }
+        if (capacity < 0) {
+            throw new IllegalArgumentException("Capacité négative interdite.");
+        }
+
+        Arc arc = new Arc();
+        arc.setSource(source);
+        arc.setDestination(destination);
+        arc.setCapacity(capacity);
+        arc.setInitialCapacity(capacity);
+        arc.setFlow(0);
+        arc.setCost(cost);
+
+        source.getArcsSortant().add(arc);
+        return arc;
+    }
+
     public Graph build(String filePath) throws IOException {
         return build(Path.of(filePath));
     }
@@ -47,21 +85,16 @@ public class GraphBuilder {
             for (int index = 0; index < nodeCount; index++) {
                 Node node;
                 if (index == startIndex) {
-                    node = new StartNode();
+                    node = createStartNode(index, "s");
                     startNode = (StartNode) node;
-                    node.setName("s");
                 } else if (index == endIndex) {
-                    node = new EndNode();
+                    node = createEndNode(index, "t");
                     endNode = (EndNode) node;
-                    node.setName("t");
                 } else {
-                    node = new MiddleNode();
-                    node.setName(String.valueOf(index));
+                    node = createMiddleNode(index, String.valueOf(index));
                     middleNodes.add(node);
                 }
 
-                node.setId(index);
-                node.setArcsSortant(new ArrayList<>());
                 nodesByIndex.put(index, node);
             }
 
@@ -91,15 +124,7 @@ public class GraphBuilder {
                     throw new IllegalArgumentException("Arc invalide: " + line);
                 }
 
-                Arc arc = new Arc();
-                arc.setSource(source);
-                arc.setDestination(destination);
-                arc.setCapacity(capacity);
-                arc.setInitialCapacity(capacity);
-                arc.setFlow(0);
-                arc.setCost(cost);
-
-                source.getArcsSortant().add(arc);
+                connect(source, destination, capacity, cost);
                 parsedArcs++;
             }
 
@@ -111,6 +136,12 @@ public class GraphBuilder {
 
             return new Graph(startNode, endNode, middleNodes);
         }
+    }
+
+    private void initializeNode(Node node, int id, String name) {
+        node.setId(id);
+        node.setName(name);
+        node.setArcsSortant(new ArrayList<>());
     }
 
     private String nextDataLine(BufferedReader reader) throws IOException {
