@@ -36,6 +36,7 @@ public class ResidualGraphBuilder {
         }
 
         Graph residualGraph = new Graph(residualStart, residualEnd, residualMiddleNodes);
+        residualGraph.setResidualView(true);
         Map<Arc, Arc> residualToOriginal = new HashMap<>();
         Map<Arc, Boolean> residualIsReverse = new HashMap<>();
         Map<Arc, Arc> residualReverseArc = new HashMap<>();

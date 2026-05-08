@@ -10,6 +10,7 @@ public class Graph {
     private EndNode endNode;
     private List<Node> nodeList;
     private Graph residualGraph;
+    private boolean residualView;
     private int maxFlow;
     private int cost;
     private List<Arc> minCutEdges;
@@ -95,6 +96,14 @@ public class Graph {
         this.residualGraph = residualGraph;
     }
 
+    public boolean isResidualView() {
+        return residualView;
+    }
+
+    public void setResidualView(boolean residualView) {
+        this.residualView = residualView;
+    }
+
     public Map<Arc, Arc> getResidualToOriginal() {
         return residualToOriginal;
     }
@@ -131,14 +140,11 @@ public class Graph {
                         .append(arc.getSource().getName())
                         .append(" -> ")
                         .append(arc.getDestination().getName())
-                    .append(" [label = <<font color=\"blue\">")
-                    .append(arc.getFlow())
-                    .append("/")
-                    .append(arc.getInitialCapacity())
-                    .append("</font>,<font color=\"red\">")
-                        .append(arc.getCost())
-                    .append("</font>>")
-                ;
+                            .append(" [label = <<font color=\"blue\">")
+                            .append(displayCapacity(arc))
+                            .append("</font>,<font color=\"red\">")
+                            .append(arc.getCost())
+                            .append("</font>>");
                 if (highlight) builder.append(", color=red");
                 builder.append("]");
                 builder.append("\n");
@@ -157,9 +163,7 @@ public class Graph {
                             .append(" -> ")
                             .append(arc.getDestination().getName())
                             .append(" [label = <<font color=\"blue\">")
-                            .append(arc.getFlow())
-                            .append("/")
-                            .append(arc.getInitialCapacity())
+                        .append(displayCapacity(arc))
                             .append("</font>,<font color=\"red\">")
                             .append(arc.getCost())
                             .append("</font>>")
@@ -181,6 +185,14 @@ public class Graph {
 
         return builder.toString().trim();
     }
+
+    private String displayCapacity(Arc arc) {
+        if (residualView) {
+            return String.valueOf(arc.getCapacity());
+        }
+        return arc.getFlow() + "/" + arc.getInitialCapacity();
+    }
+
     public String nodeListToString(){
         StringBuilder builder = new StringBuilder();
 

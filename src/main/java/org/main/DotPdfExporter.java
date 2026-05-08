@@ -8,18 +8,20 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class DotPdfExporter {
-    private static final Path RESOURCES_DIRECTORY = Path.of("src/main/resources");
+    private static final Path RESOURCES_DIRECTORY = Path.of("resources");
 
-    public void export(Graph graph, Path inputFilePath, String outputDirectoryName, int cost, int maxFlow) throws IOException {
-        String baseName = baseName(inputFilePath);
-        Path outputDirectory = RESOURCES_DIRECTORY.resolve(outputDirectoryName);
+    public void export(Graph graph, Path outputDirectory, String fileName, int cost, int maxFlow) throws IOException {
         Files.createDirectories(outputDirectory);
 
-        Path dotPath = outputDirectory.resolve(baseName + ".dot");
-        Path pdfPath = outputDirectory.resolve(baseName + ".pdf");
+        Path dotPath = outputDirectory.resolve(fileName + ".dot");
+        Path pdfPath = outputDirectory.resolve(fileName + ".pdf");
 
-        Files.writeString(dotPath, addGraphInfo(graph.toString(), cost, maxFlow), StandardCharsets.UTF_8);
-        generatePdf(dotPath, pdfPath);
+        try {
+            Files.writeString(dotPath, addGraphInfo(graph.toString(), cost, maxFlow), StandardCharsets.UTF_8);
+            generatePdf(dotPath, pdfPath);
+        } finally {
+            Files.deleteIfExists(dotPath);
+        }
     }
 
     private String addGraphInfo(String dot, int cost, int maxFlow) {
@@ -55,12 +57,4 @@ public class DotPdfExporter {
         }
     }
 
-    private String baseName(Path inputFilePath) {
-        String fileName = inputFilePath.getFileName().toString();
-        int lastDotIndex = fileName.lastIndexOf('.');
-        if (lastDotIndex <= 0) {
-            return fileName;
-        }
-        return fileName.substring(0, lastDotIndex);
-    }
 }

@@ -17,7 +17,7 @@ class MinCostMaxFlowTest {
 
     @Test
     void computesMinCostMaxFlow() throws Exception {
-        Graph graph = new GraphBuilder().build(Path.of("src/main/resources/graph.txt"));
+        Graph graph = new GraphBuilder().build(Path.of("resources/exemple.txt"));
 
         Graph solution = new MinCostMaxFlow().computeMaxFlow(graph);
 

@@ -7,5 +7,9 @@ public interface MaxFlowAlgorithm {
      * @param graph 
      * @return graph
      */
-    Graph computeMaxFlow(Graph graph);
+    default Graph computeMaxFlow(Graph graph) {
+        return computeMaxFlow(graph, null);
+    }
+
+    Graph computeMaxFlow(Graph graph, ResidualStepConsumer stepConsumer);
 }

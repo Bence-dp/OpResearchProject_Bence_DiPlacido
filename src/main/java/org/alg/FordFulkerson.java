@@ -19,13 +19,15 @@ public class FordFulkerson implements MaxFlowAlgorithm {
     private final ResidualGraphBuilder residualGraphBuilder = new ResidualGraphBuilder();
 
     @Override
-    public Graph computeMaxFlow(Graph graph) {
+    public Graph computeMaxFlow(Graph graph, ResidualStepConsumer stepConsumer) {
         if (graph == null || graph.getStartNode() == null || graph.getEndNode() == null) {
             throw new IllegalArgumentException("Le graphe, la source ou le puits est nul.");
         }
 
         resetResult(graph);
         Graph residual = residualGraphBuilder.buildFrom(graph);
+        int stepIndex = 0;
+        notifyStep(stepConsumer, graph, residual, stepIndex++);
 
         Node source = residual.getStartNode();
         Node sink = residual.getEndNode();
@@ -82,6 +84,7 @@ public class FordFulkerson implements MaxFlowAlgorithm {
             }
 
             maxFlow += bottleneck;
+            notifyStep(stepConsumer, graph, residual, stepIndex++);
         }
 
         Set<Node> reachable = collectReachable(source);
@@ -102,6 +105,12 @@ public class FordFulkerson implements MaxFlowAlgorithm {
         graph.setMinCutEdges(new ArrayList<>(minCut));
 
         return graph;
+    }
+
+    private void notifyStep(ResidualStepConsumer stepConsumer, Graph originalGraph, Graph residualGraph, int stepIndex) {
+        if (stepConsumer != null) {
+            stepConsumer.accept(originalGraph, residualGraph, stepIndex);
+        }
     }
 
     private boolean bfsFindPath(Node source, Node sink, Map<Node, Arc> parentArc) {
