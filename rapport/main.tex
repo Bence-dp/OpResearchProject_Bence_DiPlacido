@@ -254,13 +254,13 @@ Cette visualisation est utile pour vérifier rapidement que le résultat a du se
 Par exemple, sur le graphe fourni, les tests indiquent un flot maximum de 15.
 Avec l'algorithme de coût minimum, le coût total attendu est 149.
 
-\IfFileExists{resources/results/graph.pdf}{
+
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.85\textwidth]{resources/results/graph.pdf}
     \caption{Graphe obtenu après le calcul sur l'exemple fourni.}
 \end{figure}
-}{}
+
 
 \section{Exemple de résolution en coût minimum}
 
@@ -270,13 +270,12 @@ flot n'a encore été envoyé. Les arcs sont seulement définis par leur capacit
 leur coût. Dans les figures, le label bleu correspond à
 \texttt{flot/capacité}, et le nombre rouge correspond au coût de l'arc.
 
-\IfFileExists{resources/initials/graph.pdf}{
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.5\textwidth]{resources/initials/graph.pdf}
     \caption{Graphe initial avant le calcul : toutes les valeurs de flot sont à 0.}
 \end{figure}
-}{}
+
 
 Sur ce graphe initial, il faut trouver la solution avec le flot max qui coûte le moins cher. C'est
 pour cela que l'algorithme ne prend pas simplement le premier chemin disponible :
@@ -343,5 +342,65 @@ passages bloquent le réseau, ou quelle organisation donne le même résultat po
 un coût plus faible. C'est ce qui rend ces algorithmes intéressants. Une fois le
 problème bien traduit en source, puits, capacités et coûts, le calcul permet de
 faire apparaître des solutions qui ne sont pas toujours évidentes à trouver.
+
+
+
+\newpage
+
+\section{Résolution des exemples donner}
+
+\subsection{Exemple 1}
+\subsubsection{Flot max}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{resources/results/exemple.pdf}
+    \caption{Graphe obtenu après le calcul du flot max sur l'exemple fourni.}
+\end{figure}
+
+On obtient un flot de 15 avec la coupe minimal qui contient les arcs saturés (0->2, 1->3)
+
+\subsubsection{Flot max min cost}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{resources/results/exemple_with_cost.pdf}
+    \caption{Graphe obtenu après le calcul du min cost flot max sur l'exemple fourni.}
+\end{figure}
+
+On obtient un flot de 15 avec un coût de 149 et la coupe minimal qui contient toujours les arcs saturés (0->2, 1->3)
+
+\subsection{Exercice 1 (fichier word)}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{resources/results/exo1_max_flow.pdf}
+    \caption{Graphe obtenu après le calcul du flot max sur l'exemple fourni.}
+\end{figure}
+
+On obtient un flot de 60 avec la coupe minimal qui contient les arcs saturés (S->1, S->2, S->3)
+
+\subsection{Exercice 2 (fichier word)}
+
+\begin{enumerate}
+    \item Sans capacité des tâches, on obtient un flot de 10 avec un coût de 370, les arcs de la min cut sont les arcs sortant de la source.
+    \item Avec une capacité de 2 par tâches, on obtient un flot de 10 avec un coût de 404, les arcs de la min cut sont les arcs sortant de la source.
+    \item Avec chaque tâche prise au moin une fois, on obtient un flot de 10 avec un coût de 413.
+\end{enumerate}
+
+
+\subsection{Exercice 3 (fichier word)}
+\subsubsection{Flot max min cost dans (t,s)}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{resources/results/exo3_min_cost1.pdf}
+    \caption{Graphe obtenu après le calcul du flot max min cost de (t,s) sur l'exemple fourni.}
+\end{figure}
+On obtient un flot de 20 avec un coût de 150 et  la coupe minimal qui contient les arcs saturés (S->0)
+
+\subsubsection{Flot max min cost dans (0,4)}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{resources/results/exo3_min_cost04.pdf}
+    \caption{Graphe obtenu après le calcul du flot max min cost de (0,4) sur l'exemple fourni.}
+\end{figure}
+On obtient un flot de 23 avec un coût de 187 et  la coupe minimal qui contient les arcs saturés (s->1, s->2) (s est 0)
 
 \end{document}
