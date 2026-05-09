@@ -387,11 +387,11 @@ On obtient un flot de 60 avec la coupe minimal qui contient les arcs saturés (S
 
 
 \subsection{Exercice 3 (fichier word)}
-\subsubsection{Flot max min cost dans (t,s)}
+\subsubsection{Flot max min cost dans (s,t)}
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.6\textwidth]{resources/results/exo3_min_cost1.pdf}
-    \caption{Graphe obtenu après le calcul du flot max min cost de (t,s) sur l'exemple fourni.}
+    \caption{Graphe obtenu après le calcul du flot max min cost de (s,t) sur l'exemple fourni.}
 \end{figure}
 On obtient un flot de 20 avec un coût de 150 et  la coupe minimal qui contient les arcs saturés (S->0)
 
@@ -403,4 +403,8 @@ On obtient un flot de 20 avec un coût de 150 et  la coupe minimal qui contient 
 \end{figure}
 On obtient un flot de 23 avec un coût de 187 et  la coupe minimal qui contient les arcs saturés (s->1, s->2) (s est 0)
 
+
+\subsubsection{Most vital arc de (s,t) et (0,4)}
+L'arc le plus vitale de (s,t) et l'arc s->0 car sans lui le flot est a 0. 
+L'arc le plus vitale de (0,4) et l'arc 0->1 (s->1) car c'est le plus grand arc de la coupe min, on aura donc un flot max de 8 après suppression de l'arc. (Théoreme flot max coupe min)
 \end{document}
