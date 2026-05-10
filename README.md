@@ -2,13 +2,14 @@
 
 Auteur: Bence Di Placido
 
-Petit projet Java/Gradle pour manipuler des graphes de flot.
+Projet Java/Gradle pour manipuler des graphes de flot.
 
 Le programme lit un graphe depuis un fichier texte, calcule soit un flot maximum
 simple, soit un flot maximum de coût minimum, puis génère des fichiers DOT/PDF
 pour visualiser le graphe avant et après le calcul.
+Il est également possible de générer les graphes résiduels de chaque étapes pour faciliter la compréhension du résultat final.
 
-Les fichiers d'entrée et de sortie sont placés à la racine du projet.
+Les fichiers d'entrée et de sortie sont placés dans le répertoire `resources/` .
 
 
 ## Prerequis
