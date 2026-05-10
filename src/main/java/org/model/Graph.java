@@ -145,7 +145,7 @@ public class Graph {
                             .append("</font>,<font color=\"red\">")
                             .append(arc.getCost())
                             .append("</font>>");
-                if (highlight) builder.append(", color=red");
+                if (highlight) builder.append(", color=red,penwidth=2.0");
                 builder.append("]");
                 builder.append("\n");
             }
@@ -168,7 +168,7 @@ public class Graph {
                             .append(arc.getCost())
                             .append("</font>>")
                     ;
-                    if (highlight) builder.append(", color=red");
+                    if (highlight) builder.append(", color=red,penwidth=2.0");
                     builder.append("]");
                     builder.append("\n");
                 }

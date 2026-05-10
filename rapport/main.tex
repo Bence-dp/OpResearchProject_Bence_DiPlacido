@@ -93,6 +93,7 @@ Après l'exécution, le programme génère deux versions du graphe :
     \item une version initiale, avant le calcul ;
     \item une version résultat, avec les flots calculés, le flot maximum, le
     coût total et les arcs de la coupe minimale mis en évidence.
+Il est également possible de génerer les graphe résiduels de toutes les étapes qui ont permis a résoudre le flot.
 \end{itemize}
 
 \section{Structures de données}
@@ -300,7 +301,7 @@ unités sur 3, et \texttt{3 -> t} transporte 12 unités sur 14. Le total entrant
 dans \texttt{t} est donc bien $3 + 12 = 15$, ce qui correspond au flot maximum
 affiché.
 
-Les arcs en rouge représentent la coupe minimale trouvée après le calcul. Ici,
+Les arcs en rouge plus épais représentent la coupe minimale trouvée après le calcul du flot max. Ici,
 on retrouve notamment \texttt{0 -> 2} et \texttt{1 -> 3}, qui sont saturés dans
 la solution. Cela signifie qu'une fois ces passages pleins, il n'existe plus de
 chemin résiduel permettant d'envoyer davantage de flot de \texttt{s} vers
@@ -336,12 +337,15 @@ un réseau de transport, de routes, de données ou de production. La version
 min-cost max-flow ajoute une idée importante : on garde le meilleur débit
 possible, mais en cherchant en plus à réduire le coût total.
 
-En modélisant des problèmes de tous les jours sous forme de graphe, on peut donc
+En modélisant des problèmes de tous les jours sous forme de graphe, on peut donc 
 obtenir des réponses assez concrètes : combien peut-on envoyer au maximum, quels
 passages bloquent le réseau, ou quelle organisation donne le même résultat pour
 un coût plus faible. C'est ce qui rend ces algorithmes intéressants. Une fois le
 problème bien traduit en source, puits, capacités et coûts, le calcul permet de
 faire apparaître des solutions qui ne sont pas toujours évidentes à trouver.
+
+De plus, ce projet m'a permis de mieu comprendre le fonctionnement des algorithmes de
+ maximisation de flots notament a l'aide des graphes résiduels pour chaque étapes de la résolutin ainsi que le théroeme de min cut / max flow.
 
 
 
@@ -349,21 +353,21 @@ faire apparaître des solutions qui ne sont pas toujours évidentes à trouver.
 
 \section{Résolution des exemples donner}
 
-\subsection{Exemple 1}
+\subsection{Exemple 1 (txt donné sur discord)}
 \subsubsection{Flot max}
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.6\textwidth]{resources/results/exemple.pdf}
-    \caption{Graphe obtenu après le calcul du flot max sur l'exemple fourni.}
+    \caption{Graphe obtenu après le calcul du flot max.}
 \end{figure}
 
 On obtient un flot de 15 avec la coupe minimal qui contient les arcs saturés (0->2, 1->3)
 
-\subsubsection{Flot max min cost}
+\subsubsection{Flot max min cost (txt donné sur discord)}
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.6\textwidth]{resources/results/exemple_with_cost.pdf}
-    \caption{Graphe obtenu après le calcul du min cost flot max sur l'exemple fourni.}
+    \caption{Graphe obtenu après le calcul du min cost flot max.}
 \end{figure}
 
 On obtient un flot de 15 avec un coût de 149 et la coupe minimal qui contient toujours les arcs saturés (0->2, 1->3)
@@ -372,7 +376,7 @@ On obtient un flot de 15 avec un coût de 149 et la coupe minimal qui contient t
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.6\textwidth]{resources/results/exo1_max_flow.pdf}
-    \caption{Graphe obtenu après le calcul du flot max sur l'exemple fourni.}
+    \caption{Graphe obtenu après le calcul du flot max.}
 \end{figure}
 
 On obtient un flot de 60 avec la coupe minimal qui contient les arcs saturés (S->1, S->2, S->3)
@@ -391,7 +395,7 @@ On obtient un flot de 60 avec la coupe minimal qui contient les arcs saturés (S
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.6\textwidth]{resources/results/exo3_min_cost1.pdf}
-    \caption{Graphe obtenu après le calcul du flot max min cost de (s,t) sur l'exemple fourni.}
+    \caption{Graphe obtenu après le calcul du flot max min cost de (s,t).}
 \end{figure}
 On obtient un flot de 20 avec un coût de 150 et  la coupe minimal qui contient les arcs saturés (S->0)
 
@@ -399,7 +403,7 @@ On obtient un flot de 20 avec un coût de 150 et  la coupe minimal qui contient 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.6\textwidth]{resources/results/exo3_min_cost04.pdf}
-    \caption{Graphe obtenu après le calcul du flot max min cost de (0,4) sur l'exemple fourni.}
+    \caption{Graphe obtenu après le calcul du flot max min cost de (0,4).}
 \end{figure}
 On obtient un flot de 23 avec un coût de 187 et  la coupe minimal qui contient les arcs saturés (s->1, s->2) (s est 0)
 
